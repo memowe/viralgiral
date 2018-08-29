@@ -1,0 +1,17 @@
+# Vim swap files
+*.sw[a-p]
+
+# Perl build files
+blib
+pm_to_blib
+Makefile*
+!Makefile.PL
+*META.*
+MANIFEST
+MANIFEST.bak
+
+# Generated coverage database
+cover_db/
+
+# Distribution tarballs
+ViralGiral-*.tar.gz
