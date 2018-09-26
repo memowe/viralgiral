@@ -58,6 +58,8 @@ sub _get ($self, $key) {
     return $self->events->state->{$key};
 }
 
+## CRUD methods ##
+
 sub add_entity ($self, $data = {}) {
 
     # Prepare
@@ -166,6 +168,13 @@ sub delete_user ($self, $uuid) {
 
     # Store event
     $self->events->store_event(UserDeleted => {uuid => $uuid});
+}
+
+## Data extraction methods ##
+
+sub get_entity_for_user ($self, $uuid) {
+    my $u = $self->get_user($uuid);
+    return $self->get_entity($u->{entity});
 }
 
 1;
