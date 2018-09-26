@@ -12,8 +12,10 @@ WriteMakefile(
     LICENSE             => 'mit',
     MIN_PERL_VERSION    => '5.20.0',
     PREREQ_PM           => {
-        'Mojolicious'   => '7.93',
-        'UUID::Tiny'    => '1.04',
+        'Clone'             => '0.39',
+        'EventStore::Tiny'  => '0.51',
+        'Mojolicious'       => '7.93',
+        'UUID::Tiny'        => '1.04',
     },
     META_MERGE          => {resources => {
         bugtracker => 'http://github.com/memowe/viralgiral/issues',
