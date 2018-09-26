@@ -9,6 +9,12 @@ use File::stat;
 
 use_ok 'ViralGiral::Data';
 
+subtest 'No filename given' => sub {
+    my $model = ViralGiral::Data->new;
+    eval {$model->store; fail "Didn't die!"};
+    like $@ => qr/No data_filename given!/, 'Correct error message';
+};
+
 # Create a temporary file
 my $tmpf    = File::Temp->new;
 my $fn      = $tmpf->filename;

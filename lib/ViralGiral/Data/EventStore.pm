@@ -37,6 +37,7 @@ has _est            => sub ($self) {
     my $store = (defined $est_fn and -e $est_fn)
         ? EventStore::Tiny->new_from_file($est_fn)
         : EventStore::Tiny->new;
+    $store->init_data({entity => {}, user => {}});
     $store->cache_distance(0);
     $store->slack(1); # we know what we're doing
 

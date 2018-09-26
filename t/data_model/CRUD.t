@@ -66,6 +66,12 @@ subtest 'Entity handling' => sub {
 
     subtest Update => sub {
 
+        subtest 'Unknown entity' => sub {
+            eval {$model->modify_entity(42, {foo => 42}); fail "Didn't die"};
+            like $@ => qr/Unknown entity with UUID '42'/,
+                'Correct error message';
+        };
+
         # Update the only entity
         $model->modify_entity($e_id, {answer => 17});
 
@@ -85,6 +91,14 @@ subtest 'Entity handling' => sub {
     };
 
     subtest Delete => sub {
+
+        subtest 'Unknown entity' => sub {
+            eval {$model->delete_entity(17); fail "Didn't die"};
+            like $@ => qr/Unknown entity with UUID '17'/,
+                'Correct error message';
+        };
+
+        # Delete
         $model->delete_entity($e_id);
         is_deeply $model->all_entities => {}, 'No entities left';
     };
@@ -97,6 +111,18 @@ subtest 'User handling' => sub {
     my ($u1_id, $u1_created, $u2_id, $u2_created);
 
     subtest Create => sub {
+
+        subtest 'Unknown entity' => sub {
+            eval {$model->add_user(37, undef); fail "Didn't die"};
+            like $@ => qr/Unknown entity with UUID '37'/,
+                'Correct error message';
+        };
+
+        subtest 'Unknown user reference' => sub {
+            eval {$model->add_user($e_id, 42); fail "Didn't die"};
+            like $@ => qr/Unknown user reference with UUID '42'/,
+                'Correct error message';
+        };
 
         # Add
         $u1_id = $model->add_user($e_id, undef);
@@ -122,6 +148,12 @@ subtest 'User handling' => sub {
             'Users belong to the entity';
         is_deeply [sort keys %{$model->all_users}] => [sort $u1_id, $u2_id],
             'Users created';
+
+        subtest 'Unknown user' => sub {
+            eval {$model->get_user(17); fail "Didn't die"};
+            like $@ => qr/Unknown user with UUID '17'/,
+                'Correct error message';
+        };
 
         subtest 'Root user' => sub {
 
@@ -164,6 +196,12 @@ subtest 'User handling' => sub {
 
     subtest Update => sub {
 
+        subtest 'Unknown user' => sub {
+            eval {$model->modify_user(37, {foo => 42}); fail "Didn't die"};
+            like $@ => qr/Unknown user with UUID '37'/,
+                'Correct error message';
+        };
+
         # Update
         $model->modify_user($u2_id, {foo => 17});
 
@@ -180,6 +218,14 @@ subtest 'User handling' => sub {
     };
 
     subtest Delete => sub {
+
+        subtest 'Unknown user' => sub {
+            eval {$model->delete_user(42); fail "Didn't die"};
+            like $@ => qr/Unknown user with UUID '42'/,
+                'Correct error message';
+        };
+
+        # Delete
         $model->delete_user($u2_id);
         is_deeply $model->get_entity($e_id)->{users} => [$u1_id],
             'User list in entity updated';
