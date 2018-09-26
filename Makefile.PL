@@ -19,4 +19,5 @@ WriteMakefile(
         bugtracker => 'http://github.com/memowe/viralgiral/issues',
         repository => 'http://github.com/memowe/viralgiral',
     }},
+    test                => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
 );
