@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 use Time::HiRes 'time';
 
 use_ok 'ViralGiral::Data';
@@ -41,36 +42,49 @@ subtest 'Entity handling' => sub {
 
     subtest Read => sub {
 
-        # Extract all entities
-        my $entities = $model->all_entities;
-        ok defined($entities), 'Retrieved data is defined';
-        is_deeply [keys %$entities] => [$e_id], 'Got the right ID';
-        my $e_data = $entities->{$e_id};
+        subtest 'Nothing' => sub {
 
-        # Retrieve the only entity
-        my $data = $model->get_entity($e_id);
-        ok defined($data), 'Retrieved data is defined';
-        is_deeply $data => $e_data, 'Retrieved the same data';
+            # Try to retrieve an undefined entity
+            ok not(defined $model->get_entity(undef)),
+                'Undefined result (ID undefined)';
 
-        # Check data details
-        $e_created = $data->{created};
-        ok time - $e_created < 0.1, 'Timestamp looks near';
-        ok time - $e_created > 0, 'Timestamp looks different';
-        is_deeply $data => {
-            uuid    => $e_id,
-            created => $e_created,
-            users   => [],
-            data    => {answer => 42},
-        }, 'Correct data';
+            # Try to retrieve a non-existant entity
+            ok not(defined $model->get_entity(17)), 'Unknown entity';
+        };
+
+        subtest 'All entities' => sub {
+            my $entities = $model->all_entities;
+            ok defined($entities), 'Retrieved data is defined';
+            is_deeply [keys %$entities] => [$e_id], 'Got the right ID';
+            my $e_data = $entities->{$e_id};
+        };
+
+        subtest 'One entity' => sub {
+
+            # Retrieve the only entity
+            my $data = $model->get_entity($e_id);
+            ok defined($data), 'Retrieved data is defined';
+            is_deeply $data => $data, 'Retrieved the same data';
+
+            # Check data details
+            $e_created = $data->{created};
+            ok time - $e_created < 0.1, 'Timestamp looks near';
+            ok time - $e_created > 0, 'Timestamp looks different';
+            is_deeply $data => {
+                uuid    => $e_id,
+                created => $e_created,
+                users   => [],
+                data    => {answer => 42},
+            }, 'Correct data';
+        };
     };
 
     subtest Update => sub {
 
-        subtest 'Unknown entity' => sub {
-            eval {$model->modify_entity(42, {foo => 42}); fail "Didn't die"};
-            like $@ => qr/Unknown entity with UUID '42'/,
-                'Correct error message';
-        };
+        # Unknown entity exception
+        throws_ok {$model->modify_entity(42, {foo => 42})}
+            qr/Unknown entity with UUID '42'/,
+            'Correct error message for unknown entity';
 
         # Update the only entity
         $model->modify_entity($e_id, {answer => 17});
@@ -92,11 +106,10 @@ subtest 'Entity handling' => sub {
 
     subtest Delete => sub {
 
-        subtest 'Unknown entity' => sub {
-            eval {$model->delete_entity(17); fail "Didn't die"};
-            like $@ => qr/Unknown entity with UUID '17'/,
-                'Correct error message';
-        };
+        # Unknown entity exception
+        throws_ok {$model->delete_entity(17)}
+            qr/Unknown entity with UUID '17'/,
+            'Correct error message for unknown entity';
 
         # Delete
         $model->delete_entity($e_id);
@@ -112,17 +125,15 @@ subtest 'User handling' => sub {
 
     subtest Create => sub {
 
-        subtest 'Unknown entity' => sub {
-            eval {$model->add_user(37, undef); fail "Didn't die"};
-            like $@ => qr/Unknown entity with UUID '37'/,
-                'Correct error message';
-        };
+        # Unknown entity exception
+        throws_ok {$model->add_user(37, undef)}
+            qr/Unknown entity with UUID '37'/,
+            'Correct error message for unknown entity';
 
-        subtest 'Unknown user reference' => sub {
-            eval {$model->add_user($e_id, 42); fail "Didn't die"};
-            like $@ => qr/Unknown user reference with UUID '42'/,
-                'Correct error message';
-        };
+        # Unknow user reference exception
+        throws_ok {$model->add_user($e_id, 42)}
+            qr/Unknown user reference with UUID '42'/,
+            'Correct error message for unknown user reference';
 
         # Add
         $u1_id = $model->add_user($e_id, undef);
@@ -149,10 +160,14 @@ subtest 'User handling' => sub {
         is_deeply [sort keys %{$model->all_users}] => [sort $u1_id, $u2_id],
             'Users created';
 
-        subtest 'Unknown user' => sub {
-            eval {$model->get_user(17); fail "Didn't die"};
-            like $@ => qr/Unknown user with UUID '17'/,
-                'Correct error message';
+        subtest 'Nothing' => sub {
+
+            # Try to retrieve an undefined user
+            ok not(defined $model->get_user(undef)),
+                'Undefined result (ID undefined)';
+
+            # Try to retrieve a non-existant user
+            ok not(defined $model->get_user(17)), 'Unknown user';
         };
 
         subtest 'Root user' => sub {
@@ -196,11 +211,10 @@ subtest 'User handling' => sub {
 
     subtest Update => sub {
 
-        subtest 'Unknown user' => sub {
-            eval {$model->modify_user(37, {foo => 42}); fail "Didn't die"};
-            like $@ => qr/Unknown user with UUID '37'/,
-                'Correct error message';
-        };
+        # Unknown user exception
+        throws_ok {$model->modify_user(37, {foo => 42})}
+            qr/Unknown user with UUID '37'/,
+            'Correct error message (unknown user)';
 
         # Update
         $model->modify_user($u2_id, {foo => 17});
@@ -219,11 +233,10 @@ subtest 'User handling' => sub {
 
     subtest Delete => sub {
 
-        subtest 'Unknown user' => sub {
-            eval {$model->delete_user(42); fail "Didn't die"};
-            like $@ => qr/Unknown user with UUID '42'/,
-                'Correct error message';
-        };
+        # Unknown user exception
+        throws_ok {$model->delete_user(42)}
+            qr/Unknown user with UUID '42'/,
+            'Correct error message (unknown user)';
 
         # Delete
         $model->delete_user($u2_id);

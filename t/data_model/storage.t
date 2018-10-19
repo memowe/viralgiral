@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 use File::Temp;
 use File::stat;
 
@@ -11,8 +12,8 @@ use_ok 'ViralGiral::Data';
 
 subtest 'No filename given' => sub {
     my $model = ViralGiral::Data->new;
-    eval {$model->store; fail "Didn't die!"};
-    like $@ => qr/No data_filename given!/, 'Correct error message';
+    throws_ok {$model->store} qr/No data_filename given!/,
+        'Correct error message';
 };
 
 # Create a temporary file

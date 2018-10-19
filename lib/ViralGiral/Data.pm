@@ -77,14 +77,16 @@ sub all_entities ($self) {
 }
 
 sub get_entity ($self, $uuid) {
+    return unless defined $uuid;
     return $self->_get('entity')->{$uuid};
 }
 
 sub modify_entity ($self, $uuid, $data) {
 
     # Entity lookup
-    my $e = $self->_get('entity')->{$uuid};
-    die "Unknown entity with UUID '$uuid'\n" unless defined $e;
+    my $e = $self->get_entity($uuid);
+    my $uuid_str = $uuid // 'undef';
+    die "Unknown entity with UUID '$uuid_str'\n" unless defined $e;
 
     # Mix data updates in
     my %new_data = (%{$e->{data}}, %$data);
@@ -99,8 +101,9 @@ sub modify_entity ($self, $uuid, $data) {
 sub delete_entity ($self, $uuid) {
 
     # Entity lookup
-    die "Unknown entity with UUID '$uuid'\n"
-        unless defined $self->_get('entity')->{$uuid};
+    my $uuid_str = $uuid // 'undef';
+    die "Unknown entity with UUID '$uuid_str'\n"
+        unless defined $self->get_entity($uuid);
 
     # Store event
     $self->events->store_event(EntityDeleted => {uuid => $uuid});
@@ -109,12 +112,13 @@ sub delete_entity ($self, $uuid) {
 sub add_user ($self, $entity_uuid, $reference, $data = {}) {
 
     # Entity lookup
-    die "Unknown entity with UUID '$entity_uuid'\n"
-        unless defined $self->_get('entity')->{$entity_uuid};
+    my $e = $self->get_entity($entity_uuid);
+    my $entity_uuid_str = $entity_uuid // 'undef';
+    die "Unknown entity with UUID '$entity_uuid_str'\n" unless defined $e;
 
     # Reference lookup
     die "Unknown user reference with UUID '$reference'\n"
-        if defined $reference and not defined $self->_get('user')->{$reference};
+        if defined $reference and not defined $self->get_user($reference);
 
     # Prepare
     my $uuid = create_uuid_as_string;
@@ -136,19 +140,16 @@ sub all_users ($self) {
 }
 
 sub get_user ($self, $uuid) {
-
-    # User lookup
-    my $u = $self->_get('user')->{$uuid};
-    die "Unknown user with UUID '$uuid'\n" unless defined $u;
-
-    return $u;
+    return unless defined $uuid;
+    return $self->_get('user')->{$uuid};
 }
 
 sub modify_user ($self, $uuid, $data) {
 
     # User lookup
-    my $u = $self->_get('user')->{$uuid};
-    die "Unknown user with UUID '$uuid'\n" unless defined $u;
+    my $u = $self->get_user($uuid);
+    my $uuid_str = $uuid // 'undef';
+    die "Unknown user with UUID '$uuid_str'\n" unless defined $u;
 
     # Mix data updates in
     my %new_data = (%{$u->{data}}, %$data);
@@ -163,8 +164,9 @@ sub modify_user ($self, $uuid, $data) {
 sub delete_user ($self, $uuid) {
 
     # User lookup
-    die "Unknown user with UUID '$uuid'\n"
-        unless defined $self->_get('user')->{$uuid};
+    my $uuid_str = $uuid // 'undef';
+    die "Unknown user with UUID '$uuid_str'\n"
+        unless defined $self->get_user($uuid);
 
     # Store event
     $self->events->store_event(UserDeleted => {uuid => $uuid});

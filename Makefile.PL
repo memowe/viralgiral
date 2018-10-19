@@ -17,6 +17,9 @@ WriteMakefile(
         'Mojolicious'       => '7.93',
         'UUID::Tiny'        => '1.04',
     },
+    TEST_REQUIRES => {
+        'Test::Exception'   => '0.43',
+    },
     META_MERGE          => {resources => {
         bugtracker => 'http://github.com/memowe/viralgiral/issues',
         repository => 'http://github.com/memowe/viralgiral',
