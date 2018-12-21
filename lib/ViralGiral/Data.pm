@@ -141,7 +141,7 @@ sub all_users ($self) {
 
 sub get_user ($self, $uuid) {
     return unless defined $uuid;
-    return $self->_get('user')->{$uuid};
+    return ($self->all_users // {})->{$uuid};
 }
 
 sub modify_user ($self, $uuid, $data) {
