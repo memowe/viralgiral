@@ -236,19 +236,34 @@ subtest 'User handling' => sub {
 
     subtest Delete => sub {
 
-        # Unknown user exception
-        throws_ok {$model->delete_user(42)}
-            qr/Unknown user with UUID '42'/,
-            'Correct error message (unknown user)';
+        subtest Unknown => sub {
+            throws_ok {$model->delete_user(42)}
+                qr/Unknown user with UUID '42'/,
+                'Correct error message (unknown user)';
+        };
 
-        # Delete
-        $model->delete_user($u2_id);
-        is_deeply $model->get_entity($e_id)->{users} => [$u1_id],
-            'User list in entity updated';
-        is_deeply $model->get_user($u1_id)->{successors} => [],
-            'Parent successor list empty';
-        is_deeply [keys %{$model->all_users}] => [$u1_id],
-            'User list updated';
+        subtest Child => sub {
+            $model->delete_user($u2_id);
+            is_deeply $model->get_entity($e_id)->{users} => [$u1_id],
+                'User list in entity updated';
+            is_deeply $model->get_user($u1_id)->{successors} => [],
+                'Parent successor list empty';
+            is_deeply [keys %{$model->all_users}] => [$u1_id],
+                'User list updated';
+        };
+
+        # Re-add a child
+        my $u3_id = $model->add_user($e_id, $u1_id);
+
+        subtest Root => sub {
+            $model->delete_user($u1_id);
+            is_deeply $model->get_entity($e_id)->{users} => [$u3_id],
+                'User list in entity updated';
+            is $model->get_user($u3_id)->{reference} => undef,
+                'Not longer referenced by child';
+            is_deeply [keys %{$model->all_users}] => [$u3_id],
+                'User list updated';
+        };
     };
 };
 
