@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 
 use_ok 'ViralGiral::Data';
 my $model = ViralGiral::Data->new;
@@ -19,6 +20,14 @@ my $u3_id   = $model->add_user($e_id, $u2_id);
 my $u4_id   = $model->add_user($e_id, $u2_id);
 
 subtest 'Entity data per user' => sub {
+
+    subtest 'No user' => sub {
+        throws_ok {$model->get_entity_for_user(undef)}
+            qr/Unknown user with UUID 'undef'/, 'UUID undefined';
+        throws_ok {$model->get_entity_for_user(42)}
+            qr/Unknown user with UUID '42'/, 'Unknown UUID';
+    };
+
     my $e = $model->get_entity_for_user($u1_id);
 
     # Check data

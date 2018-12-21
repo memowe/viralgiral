@@ -175,7 +175,12 @@ sub delete_user ($self, $uuid) {
 ## Data extraction methods ##
 
 sub get_entity_for_user ($self, $uuid) {
+
+    # User lookup
     my $u = $self->get_user($uuid);
+    my $uuid_str = $uuid // 'undef';
+    die "Unknown user with UUID '$uuid_str'\n" unless defined $u;
+
     return $self->get_entity($u->{entity});
 }
 
