@@ -25,6 +25,7 @@ use Clone 'clone';
 ##          created: $U_TS,
 ##          entity: $E_UUID,
 ##          reference: $U2_UUID (or undef),
+##          successors: [ $S_UUID ],
 ##          data: \%user_data,
 ##      }
 ##  }
@@ -79,8 +80,15 @@ sub init ($self) {
             created     => time,
             entity      => $data->{entity_uuid},
             reference   => $data->{reference}, # possibly undef
+            successors  => [],
             data        => clone($data->{data}),
         };
+
+        # Add to parent successors
+        push @{$state->{user}{$data->{reference}}{successors}}, $data->{uuid}
+            if defined $data->{reference};
+
+        # Add to entity users
         push @{$state->{entity}{$data->{entity_uuid}}{users}}, $data->{uuid};
     });
 
@@ -92,8 +100,19 @@ sub init ($self) {
 
     # A user has been deleted
     $self->_est->register_event(UserDeleted => sub ($state, $data) {
+
+        # Delete from entity users
         my $e = $state->{entity}{$state->{user}{$data->{uuid}}->{entity}};
         @{$e->{users}} = grep {$_ ne $data->{uuid}} @{$e->{users}};
+
+        # Delete from parent user successors
+        if (defined $state->{user}{$data->{uuid}}{reference}) {
+            my $u = $state->{user}{$state->{user}{$data->{uuid}}{reference}};
+            @{$u->{successors}} = grep {$_ ne $data->{uuid}}
+                @{$u->{successors}};
+        }
+
+        # Delete
         delete $state->{user}{$data->{uuid}};
     });
 

@@ -185,6 +185,7 @@ subtest 'User handling' => sub {
                 created     => $u1_created,
                 entity      => $e_id,
                 reference   => undef,
+                successors  => [$u2_id],
                 data        => {},
             }, 'Correct user data';
         };
@@ -204,6 +205,7 @@ subtest 'User handling' => sub {
                 created     => $u2_created,
                 entity      => $e_id,
                 reference   => $u1_id,
+                successors  => [],
                 data        => {foo => 42},
             }, 'Correct user data';
         };
@@ -227,6 +229,7 @@ subtest 'User handling' => sub {
             created     => $u2_created,
             entity      => $e_id,
             reference   => $u1_id,
+            successors  => [],
             data        => {foo => 17},
         }, 'Correct user data';
     };
@@ -242,6 +245,8 @@ subtest 'User handling' => sub {
         $model->delete_user($u2_id);
         is_deeply $model->get_entity($e_id)->{users} => [$u1_id],
             'User list in entity updated';
+        is_deeply $model->get_user($u1_id)->{successors} => [],
+            'Parent successor list empty';
         is_deeply [keys %{$model->all_users}] => [$u1_id],
             'User list updated';
     };
