@@ -115,6 +115,9 @@ sub init ($self) {
             @{$r->{successors}} = grep {$_ ne $uuid} @{$r->{successors}};
         }
 
+        # Delete as parent reference from successors
+        $state->{user}{$_}{reference} = undef for @{$u->{successors}};
+
         # Delete
         delete $state->{user}{$uuid};
     });
