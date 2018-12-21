@@ -182,13 +182,44 @@ sub _get_user_strict ($self, $uuid) {
 }
 
 sub get_entity_for_user ($self, $uuid) {
+    return $self->get_entity($self->_get_user_strict($uuid)->{entity});
+}
 
-    # User lookup
-    my $u = $self->get_user($uuid);
-    my $uuid_str = $uuid // 'undef';
-    die "Unknown user with UUID '$uuid_str'\n" unless defined $u;
+sub get_predecessor ($self, $uuid) {
+    return $self->get_user($self->_get_user_strict($uuid)->{reference});
+}
 
-    return $self->get_entity($u->{entity});
+sub get_all_predecessors ($self, $uuid) {
+    my $u = $self->_get_user_strict($uuid);
+    return [$self->_get_predecessors_list($u->{uuid})];
+}
+
+sub _get_predecessors_list ($self, $uuid) {
+    my $p = $self->get_predecessor($uuid);
+    return +() unless defined $p;
+    return $p, $self->_get_predecessors_list($p->{uuid});
+}
+
+sub get_successors ($self, $uuid) {
+    my $user    = $self->_get_user_strict($uuid);
+    return [map {$self->get_user($_)} @{$user->{successors}}];
+}
+
+sub get_all_successors ($self, $uuid) {
+    my $user = $self->_get_user_strict($uuid);
+
+    # Keep track of all intermediate successors
+    my @succ_uuids_todo = @{$user->{successors}};
+
+    # Iterate
+    my @successors;
+    while (defined(my $user = $self->get_user(pop @succ_uuids_todo))) {
+        push @successors, $user;
+        push @succ_uuids_todo, @{$user->{successors}};
+    }
+
+    # Return sorted flat list of all successors
+    return [sort {$a->{created} <=> $b->{created}} @successors];
 }
 
 1;
