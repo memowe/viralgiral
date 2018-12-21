@@ -39,6 +39,62 @@ subtest 'Entity data per user' => sub {
     is_deeply $model->get_entity_for_user($u4_id) => $e, 'Same entity (u4)';
 };
 
+subtest 'Predecessors' => sub {
+
+    subtest 'Single' => sub {
+        throws_ok {$model->get_predecessor(42)}
+            qr/Unknown user with UUID '42'/, 'Invalid input UUID';
+        is $model->get_predecessor($u1_id), undef, 'No predecessor';
+        is_deeply $model->get_predecessor($u2_id), $model->get_user($u1_id),
+            'Correct predecessor of u2';
+        is_deeply $model->get_predecessor($u3_id), $model->get_user($u2_id),
+            'Correct predecessor of u3';
+        is_deeply $model->get_predecessor($u4_id), $model->get_user($u2_id),
+            'Correct predecessor of u4';
+    };
+
+    subtest 'All' => sub {
+        throws_ok {$model->get_all_predecessors(42)}
+            qr/Unknown user with UUID '42'/, 'Invalid input UUID';
+        is_deeply $model->get_all_predecessors($u1_id), [], 'No predecessor';
+        is_deeply $model->get_all_predecessors($u2_id),
+            [map $model->get_user($_) => $u1_id], 'Correct predecessors of u2';
+        is_deeply $model->get_all_predecessors($u3_id),
+            [map $model->get_user($_) => $u2_id, $u1_id],
+            'Correct predecessors of u3';
+        is_deeply $model->get_all_predecessors($u4_id),
+            [map $model->get_user($_) => $u2_id, $u1_id],
+            'Correct predecessors of u4';
+    };
+};
+
+subtest 'Successors' => sub {
+
+    subtest 'Direct' => sub {
+        throws_ok {$model->get_successors(42)}
+            qr/Unknown user with UUID '42'/, 'Invalid input UUID';
+        is_deeply $model->get_successors($u1_id),
+            [$model->get_user($u2_id)], 'One successor (u1)';
+        is_deeply $model->get_successors($u2_id),
+            [map $model->get_user($_) => $u3_id, $u4_id], 'Two successors (u2)';
+        is_deeply $model->get_successors($u3_id), [], 'No successor (u3)';
+        is_deeply $model->get_successors($u4_id), [], 'No successor (u4)';
+    };
+
+    subtest 'All' => sub {
+        throws_ok {$model->get_all_successors(42)}
+            qr/Unknown user with UUID '42'/, 'Invalid input UUID';
+        is_deeply $model->get_all_successors($u1_id),
+            [map $model->get_user($_) => $u2_id, $u3_id, $u4_id],
+            'Correct successors (u1)';
+        is_deeply $model->get_all_successors($u2_id),
+            [map $model->get_user($_) => $u3_id, $u4_id],
+            'Correct successors (u2)';
+        is_deeply $model->get_all_successors($u3_id), [], 'No successor (e3)';
+        is_deeply $model->get_all_successors($u4_id), [], 'No successor (e4)';
+    };
+};
+
 done_testing;
 
 __END__
