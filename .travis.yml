@@ -8,9 +8,9 @@ perl:
     - "5.28"
 
 install:
-    - cpanm -n --installdeps .
-    - cpanm -n --skip-satisfied Devel::Cover::Report::Codecov
-    - cpanm -n --skip-satisfied Devel::Cover::Report::Coveralls
+    - cpanm -qn --installdeps .
+    - cpanm -qn --skip-satisfied Devel::Cover::Report::Codecov
+    - cpanm -qn --skip-satisfied Devel::Cover::Report::Coveralls
 
 after_success:
     - cover -test
