@@ -101,19 +101,22 @@ sub init ($self) {
     # A user has been deleted
     $self->_est->register_event(UserDeleted => sub ($state, $data) {
 
+        # Shortcuts
+        my $uuid = $data->{uuid};
+        my $u = $state->{user}{$uuid};
+        my $e = $state->{entity}{$u->{entity}};
+
         # Delete from entity users
-        my $e = $state->{entity}{$state->{user}{$data->{uuid}}->{entity}};
-        @{$e->{users}} = grep {$_ ne $data->{uuid}} @{$e->{users}};
+        @{$e->{users}} = grep {$_ ne $uuid} @{$e->{users}};
 
         # Delete from parent user successors
-        if (defined $state->{user}{$data->{uuid}}{reference}) {
-            my $u = $state->{user}{$state->{user}{$data->{uuid}}{reference}};
-            @{$u->{successors}} = grep {$_ ne $data->{uuid}}
-                @{$u->{successors}};
+        if (defined $u->{reference}) {
+            my $r = $state->{user}{$u->{reference}};
+            @{$r->{successors}} = grep {$_ ne $uuid} @{$r->{successors}};
         }
 
         # Delete
-        delete $state->{user}{$data->{uuid}};
+        delete $state->{user}{$uuid};
     });
 
     # Import existing events, if any
