@@ -191,13 +191,19 @@ sub get_predecessor ($self, $uuid) {
 
 sub get_all_predecessors ($self, $uuid) {
     my $u = $self->_get_user_strict($uuid);
-    return [$self->_get_predecessors_list($u->{uuid})];
-}
 
-sub _get_predecessors_list ($self, $uuid) {
-    my $p = $self->get_predecessor($uuid);
-    return +() unless defined $p;
-    return $p, $self->_get_predecessors_list($p->{uuid});
+    # Keep track of intermediate predecessors
+    my $puuid_todo = $u->{reference};
+
+    # Iterate to the top
+    my @predecessors;
+    while (defined(my $p = $self->get_user($puuid_todo))) {
+        $puuid_todo = $p->{reference};
+        push @predecessors, $p;
+    }
+
+    # Done
+    return \@predecessors;
 }
 
 sub get_successors ($self, $uuid) {
