@@ -41,6 +41,7 @@ subtest 'Stored correctly' => sub {
 
     # Read from it
     my $m2 = ViralGiral::Data->new(data_filename => $fn);
+    $m2->logger(undef);
     is $m2->get_entity($e_id)->{data}{foo} => 42, 'Correct data';
 };
 
@@ -60,6 +61,7 @@ subtest 'Storage neccessary?' => sub {
 
         # Check content
         my $m2 = ViralGiral::Data->new(data_filename => $fn);
+        $m2->logger(undef);
         is $m2->get_entity($e_id)->{data}{foo} => 17, 'Correct data';
     };
 };
