@@ -50,7 +50,10 @@ Prerequisites
 License and copyright
 ---------------------
 
-Copyright (c) 2018 Mirko Westermeier
+Copyright (c) 2018 [Mirko Westermeier][mirko] ([mirko@westermeier.de][mmail])
+
+[mirko]: http://mirko.westermeier.de
+[mmail]: mailto:mirko@westermeier.de
 
 This library is distributed under the MIT (X11) License:
 
