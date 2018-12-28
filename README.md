@@ -38,7 +38,7 @@ Prerequisites
 | [EventStore::Tiny][evstti] | 0.6 |
 | [Mojolicious][mojo] | 7.93 |
 | [UUID::Tiny][uuti] | 1.04 |
-| [*Test::Exception*][teex]<br>(Tests only) | 0.43 |
+| *[Test::Exception][teex]<br>(Tests only)* | *0.43* |
 
 [perl]: https://www.perl.org/get.html
 [clone]: https://metacpan.org/pod/Clone
