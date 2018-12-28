@@ -33,7 +33,7 @@ Prerequisites
 **[Perl 5.20][perl]**
 
 | Module | Version |
-|--------|---------|
+|--------|--------:|
 | [Clone][clone] | 0.39 |
 | [EventStore::Tiny][evstti] | 0.6 |
 | [Mojolicious][mojo] | 7.93 |
