@@ -3,12 +3,29 @@ ViralGiral
 
 Builder for viral web "games".
 
-Status
-------
-
 [![Travis CI tests](https://travis-ci.org/memowe/viralgiral.svg?branch=master)](https://travis-ci.org/memowe/viralgiral)
 [![Codecov test coverage](https://codecov.io/gh/memowe/viralgiral/branch/master/graph/badge.svg)](https://codecov.io/gh/memowe/viralgiral)
 [![Coveralls test coverage](https://coveralls.io/repos/github/memowe/viralgiral/badge.svg?branch=master)](https://coveralls.io/github/memowe/viralgiral?branch=master)
+
+```perl
+#!/usr/bin/env perl
+use Mojolicious::Lite -signatures;
+
+plugin ViralGiral => {
+    data_filename   => '/path/to/storage_file.data',    # default: ./VG_data
+    prefix          => 'foo',                           # default: ''
+};
+
+# Viral "games" routes generated.
+# ViralGiral::Data helper available.
+
+get '/inspect_entity/:uuid' => sub ($c) {
+    my $e = $c->viralgiral_data->get_entity($c->param('uuid'));
+    $c->render(text => $c->dumper($e));
+};
+
+app->start;
+```
 
 License and copyright
 ---------------------
