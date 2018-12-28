@@ -13,5 +13,8 @@ MANIFEST.bak
 # Generated coverage database
 cover_db/
 
+# Storage file
+VG_data
+
 # Distribution tarballs
 ViralGiral-*.tar.gz
