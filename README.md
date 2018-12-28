@@ -27,6 +27,26 @@ get '/inspect_entity/:uuid' => sub ($c) {
 app->start;
 ```
 
+Prerequisites
+-------------
+
+**[Perl 5.20][perl]**
+
+| Module | Version |
+|--------|---------|
+| [Clone][clone] | 0.39 |
+| [EventStore::Tiny][evstti] | 0.6 |
+| [Mojolicious][mojo] | 7.93 |
+| [UUID::Tiny][uuti] | 1.04 |
+| [*Test::Exception*][teex]<br>(Tests only) | 0.43 |
+
+[perl]: https://www.perl.org/get.html
+[clone]: https://metacpan.org/pod/Clone
+[evstti]: https://metacpan.org/pod/EventStore::Tiny
+[mojo]: https://metacpan.org/pod/Mojolicious
+[uuti]: https://metacpan.org/pod/UUID::Tiny
+[teex]: https://metacpan.org/pod/Test::Exception
+
 License and copyright
 ---------------------
 
