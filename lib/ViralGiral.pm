@@ -2,7 +2,7 @@ package ViralGiral;
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
 use ViralGiral::Data;
-use ViralGiral::Controller;
+use ViralGiral::Controller::Actions;
 
 our $VERSION = '0.01';
 
@@ -17,12 +17,13 @@ sub register ($self, $app, $conf) {
         state $vgd = ViralGiral::Data->new(data_filename => $data_fn);
     });
 
-    # Inject routes: dispatch to actions as methods in VG::Controller
-    $app->routes->get("$prefix/:action")
-        ->to('ViralGiral::Controller')->name('viralgiral');
+    # Inject routes
+    my $r = $app->routes->detour(namespace => 'ViralGiral::Controller');
+    $r->get("$prefix/info")->to('actions#info')->name('vg_info');
 
-    # Inject inline templates
-    push @{$app->renderer->classes}, 'ViralGiral::Controller';
+    # Inject inline templates and static assets
+    push @{$app->renderer->classes},
+        'ViralGiral::Controller::Actions';
 }
 
 1;

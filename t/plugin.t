@@ -22,19 +22,15 @@ subtest 'Data' => sub {
         'Correct data filename';
 };
 
-#--- Fake action injection
-package ViralGiral::Controller;
-use Mojo::Base 'Mojolicious::Controller', -signatures;
-sub xnorzft ($c) {$c->render(text => 'xnorfzt OK')}
-package main;
-#--- End of fake action ---
-
-subtest 'Known route' => sub {
-    $t->get_ok('/vg/xnorzft')->status_is(200)->content_is('xnorfzt OK');
-};
-
-subtest 'Unknown route' => sub {
-    $t->get_ok('/foobelhaft')->status_is(404);
+subtest 'Info action' => sub {
+    $t->get_ok('/vg/info')->status_is(200)
+        ->text_is(h1 => 'ViralGiral is running!', 'Correct headline')
+        ->content_like(qr/
+            perl                .*  $^V .*
+            ViralGiral          .*  $ViralGiral::VERSION .*
+            Mojolicious         .*  $Mojolicious::VERSION .*
+            EventStore::Tiny    .*  $EventStore::Tiny::VERSION .*
+        /sx, 'Correct info data');
 };
 
 #--- Load ViralGiral plugin with configuration data ---
@@ -45,23 +41,14 @@ plugin ViralGiral => {
 };
 #--- End of config ---
 
-#--- Fake action injection
-package ViralGiral::Controller;
-sub quux ($c) {$c->render(text => 'quux OK')}
-package main;
-#--- End of fake action ---
-
 subtest 'Configured data' => sub {
     is $t->app->viralgiral_data->data_filename => $data_fn,
         'Correct data filename';
 };
 
-subtest 'Old known route' => sub {
-    $t->get_ok('/xnorfzt')->status_is(404);
-};
-
-subtest 'Known configured route' => sub {
-    $t->get_ok('/foobarbaz/quux')->status_is(200)->content_is('quux OK');
+subtest 'Configured info action' => sub {
+    $t->get_ok('/foobarbaz/info')->status_is(200)
+        ->text_is(h1 => 'ViralGiral is running!', 'Correct headline');
 };
 
 subtest 'Unknown configured route' => sub {
