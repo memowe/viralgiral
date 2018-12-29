@@ -32,7 +32,7 @@ use Clone 'clone';
 
 has data_filename   => ();
 has _est            => sub ($self) {
-    my $store = EventStore::Tiny->new;
+    my $store = EventStore::Tiny->new(logger => undef);
     $store->cache_distance(0);
     $store->slack(1); # we know what we're doing
     return $store;
