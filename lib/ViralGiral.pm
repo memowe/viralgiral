@@ -9,7 +9,7 @@ sub register ($self, $app, $conf) {
 
     # Default values
     my $data_fn = $conf->{data_filename} // $app->home->rel_file('VG_data');
-    my $prefix  = $conf->{prefix}        // '';
+    my $prefix  = $conf->{prefix}        // 'vg';
 
     # Add viralgiral data helper
     $app->helper(viralgiral_data => sub {

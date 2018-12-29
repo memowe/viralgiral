@@ -30,7 +30,7 @@ package main;
 #--- End of fake action ---
 
 subtest 'Known route' => sub {
-    $t->get_ok('/xnorzft')->status_is(200)->content_is('xnorfzt OK');
+    $t->get_ok('/vg/xnorzft')->status_is(200)->content_is('xnorfzt OK');
 };
 
 subtest 'Unknown route' => sub {
