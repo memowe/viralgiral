@@ -14,6 +14,7 @@ use Mojolicious::Lite -signatures;
 plugin ViralGiral => {
     data_filename   => '/path/to/storage_file.data',    # default: ./VG_data
     prefix          => 'foo',                           # default: 'vg'
+    introspection   => 1,                               # default: undef
 };
 
 # Viral "games" routes generated.
