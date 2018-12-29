@@ -24,13 +24,14 @@ subtest 'Data' => sub {
 
 subtest 'Info action' => sub {
     $t->get_ok('/vg/info')->status_is(200)
-        ->text_is(h1 => 'ViralGiral is running!', 'Correct headline')
-        ->content_like(qr/
-            perl                .*  $^V .*
-            ViralGiral          .*  $ViralGiral::VERSION .*
-            Mojolicious         .*  $Mojolicious::VERSION .*
-            EventStore::Tiny    .*  $EventStore::Tiny::VERSION .*
-        /sx, 'Correct info data');
+        ->text_is(h1 => 'ViralGiral is running!', 'Correct headline');
+    my $versions = $t->tx->res->dom->at('table');
+    like $versions->all_text => qr/^ \s* Version \s*
+        perl                \s* $^V                         \s*
+        ViralGiral          \s* $ViralGiral::VERSION        \s*
+        Mojolicious         \s* $Mojolicious::VERSION       \s*
+        EventStore::Tiny    \s* $EventStore::Tiny::VERSION  \s*
+    $/x, 'Correct info data';
 };
 
 #--- Load ViralGiral plugin with configuration data ---
