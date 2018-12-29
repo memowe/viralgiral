@@ -2,6 +2,7 @@ package ViralGiral;
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
 use ViralGiral::Data;
+use ViralGiral::Controller;
 
 our $VERSION = '0.01';
 
@@ -19,6 +20,9 @@ sub register ($self, $app, $conf) {
     # Inject routes: dispatch to actions as methods in VG::Controller
     $app->routes->get("$prefix/:action")
         ->to('ViralGiral::Controller')->name('viralgiral');
+
+    # Inject inline templates
+    push @{$app->renderer->classes}, 'ViralGiral::Controller';
 }
 
 1;
