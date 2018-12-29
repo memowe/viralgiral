@@ -55,4 +55,15 @@ subtest 'Unknown configured route' => sub {
     $t->get_ok('/foobarbaz/foobelhaft')->status_is(404);
 };
 
+subtest 'Shortener' => sub {
+    is $t->app->shorten(       123 => 5)    =>      '123';
+    is $t->app->shorten(      1234 => 5)    =>     '1234';
+    is $t->app->shorten(     12345 => 5)    =>    '12345';
+    is $t->app->shorten(    123456 => 5)    =>    '12345...';
+    is $t->app->shorten(   1234567 => 5)    =>    '12345...';
+    is $t->app->shorten(  12345678 => 6)    =>   '123456...';
+    is $t->app->shorten( 123456789     )    => '12345678...',
+        'Correct default: 8';
+};
+
 done_testing;

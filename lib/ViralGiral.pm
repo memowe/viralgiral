@@ -17,6 +17,13 @@ sub register ($self, $app, $conf) {
         state $vgd = ViralGiral::Data->new(data_filename => $data_fn);
     });
 
+    # Add shortener helper
+    $app->helper(shorten => sub ($c, $text, $length = 8) {
+        return $text if $length >= length $text;
+        $text =~ s/^(.{$length}).*/$1.../;
+        return $text;
+    });
+
     # Inject routes
     my $r = $app->routes->detour(namespace => 'ViralGiral::Controller');
     $r->get("$prefix/info")->to('actions#info')->name('vg_info');
