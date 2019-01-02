@@ -190,4 +190,20 @@ subtest 'Entity details' => sub {
     };
 };
 
+subtest 'User details' => sub {
+
+    subtest 'Unknown user' => sub {
+        $t->get_ok('/introspection/user/krzlbfoo')->status_is(404);
+    };
+
+    subtest 'First user' => sub {
+        my $user = $data->get_user($u1);
+        $t->get_ok("/introspection/user/$u1")->status_is(200)
+            ->text_is(h1 => 'User ' . $t->app->shorten($u1));
+
+        # TODO
+        is $t->tx->res->dom->at('pre')->text => pp($user);
+    };
+};
+
 done_testing;

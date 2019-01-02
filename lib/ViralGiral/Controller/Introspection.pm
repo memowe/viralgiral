@@ -109,7 +109,7 @@ __DATA__
 % layout 'vg_intro', title => 'User ' . shorten $uuid;
 % use POSIX 'strftime';
 % use Data::Dump 'pp';
-<p><strong>TODO</strong></p>
+<pre><%= pp $user %></pre>
 
 @@ layouts/vg_intro.html.ep
 <!doctype html>
