@@ -5,6 +5,7 @@ use ViralGiral::Data::EventStore;
 
 use File::stat;
 use UUID::Tiny 'create_uuid_as_string';
+use Time::HiRes 'time';
 
 has data_filename   => ();
 has last_storage    => sub ($self) {
@@ -65,8 +66,12 @@ sub add_entity ($self, $data = {}) {
     # Prepare
     my $uuid = create_uuid_as_string;
 
-    # Store event
-    $self->events->store_event(EntityAdded => {uuid => $uuid, data => $data});
+    # Store event and inject timestamp
+    $self->events->store_event(EntityAdded => {
+        uuid    => $uuid,
+        created => time,
+        data    => $data,
+    });
 
     # Return generated entity identifier
     return $uuid;
@@ -126,6 +131,7 @@ sub add_user ($self, $entity_uuid, $reference, $data = {}) {
     # Store event
     $self->events->store_event(UserAdded => {
         uuid        => $uuid,
+        created     => time,
         entity_uuid => $entity_uuid,
         reference   => $reference,
         data        => $data,

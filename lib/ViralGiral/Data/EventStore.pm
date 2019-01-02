@@ -2,7 +2,6 @@ package ViralGiral::Data::EventStore;
 use Mojo::Base -base, -signatures;
 
 use EventStore::Tiny;
-use Time::HiRes 'time';
 use Clone 'clone';
 
 ##
@@ -54,7 +53,7 @@ sub init ($self) {
     $self->_est->register_event(EntityAdded => sub ($state, $data) {
         $state->{entity}{$data->{uuid}} = {
             uuid    => $data->{uuid},
-            created => time,
+            created => $data->{created},
             users   => [],
             data    => clone($data->{data}),
         };
@@ -77,7 +76,7 @@ sub init ($self) {
     $self->_est->register_event(UserAdded => sub ($state, $data) {
         $state->{user}{$data->{uuid}} = {
             uuid        => $data->{uuid},
-            created     => time,
+            created     => $data->{created},
             entity      => $data->{entity_uuid},
             reference   => $data->{reference}, # possibly undef
             successors  => [],
