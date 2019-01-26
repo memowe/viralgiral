@@ -137,6 +137,8 @@ __DATA__
     </tbody>
 </table>
 
+<p><%= link_to 'Entity details' => vg_intro_show_entity => {uuid => $user->{entity}} %></p>
+
 <h2>Direct Successors</h2>
 % my @succs = map {viralgiral_data->get_user($_)} @{$user->{successors}};
 <table id="user-successors" class="table table-hover">
@@ -157,6 +159,8 @@ __DATA__
     % }
     </tbody>
 </table>
+
+<p><%= link_to 'Entity details' => vg_intro_show_entity => {uuid => $user->{entity}} %></p>
 
 @@ layouts/vg_intro.html.ep
 <!doctype html>
