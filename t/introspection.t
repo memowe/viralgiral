@@ -201,8 +201,141 @@ subtest 'User details' => sub {
         $t->get_ok("/introspection/user/$u1")->status_is(200)
             ->text_is(h1 => 'User ' . $t->app->shorten($u1));
 
-        # TODO
-        is $t->tx->res->dom->at('pre')->text => pp($user);
+        subtest 'Base data' => sub {
+            my $base_data_rows = $t->tx->res->dom('#user-base-data li');
+            is scalar(@$base_data_rows) => 4, 'Got two base data rows';
+            my ($r_uuid, $r_crea, $r_ent, $r_ref) = @$base_data_rows;
+            like $r_uuid->all_text => qr/^ UUID: \s+ $u1 $/x,
+                'Correct UUID row';
+            my $rx = quotemeta strftime '%F %T' => localtime $user->{created};
+            like $r_crea->all_text => qr/^ Created: \s+ $rx $/x,
+                'Correct created row';
+            like $r_ent->all_text => qr/^ Entity: /x,
+                'Correct entity row text beginning';
+            my $ent_link = $r_ent->at('a');
+            is $ent_link->attr('href') =>
+               '/introspection/entity/' . $user->{entity},
+               'Correct entity link url';
+            is $ent_link->text, $t->app->shorten($user->{entity}),
+                'Correct entity link text';
+            like $r_ref->all_text => qr/^ Reference\ user: \s+ None $/x,
+                'Correct reference row';
+        };
+
+        subtest 'User data' => sub {
+           my $thead = $t->tx->res->dom->at('#user-data thead');
+            like $thead->all_text => qr/^ \s* Field \s+ Data \s* $/x,
+                'Correct table head';
+            my $data_rows = $t->tx->res->dom('#user-data tbody tr');
+            my $data = $user->{data};
+            is scalar(@$data_rows) => scalar(keys %$data),
+                'Correct data field count';
+
+            for my $i (0 .. keys(%$data) - 1) {
+                my $key = (sort keys %$data)[$i];
+                my $row = $data_rows->[$i];
+                subtest "Row $i" => sub {
+                    is $row->at('th')->text => $key, 'Correct field th';
+                    is $row->at('td code')->text => pp($data->{$key}),
+                        'Correct data stringification';
+                };
+            }
+        };
+
+        subtest 'Direct successors' => sub {
+            my $thead = $t->tx->res->dom->at('#user-successors thead');
+            like $thead->all_text => qr/^ \s* User \s+ UUID
+                \s+ Created \s+ Data \s* $/x, 'Correct table head';
+
+            my $user_rows = $t->tx->res->dom('#user-successors tbody tr');
+            is scalar(@$user_rows) => 1, 'One user row found';
+
+            for my $i (0 .. $#{$user->{successors}}) {
+                my $uuid = $user->{successors}[$i];
+                my $user = $t->app->viralgiral_data->get_user($uuid);
+                my $row  = $user_rows->[$i];
+                subtest "User $i" => sub {
+
+                    # UUID / user link
+                    my $th_link = $row->at('th a');
+                    is $th_link->text => $t->app->shorten($uuid),
+                        'Correct UUID';
+                    is $th_link->attr('href') => "/introspection/user/$uuid",
+                        'Correct user page link';
+
+                    # Created
+                    is $row->find('td')->[0]->text =>
+                        strftime('%F %T' => localtime $user->{created}),
+                        'Correct creation time';
+
+                    # Data
+                    is $row->at('td code')->text => pp($user->{data}),
+                        'Correct data stringification';
+                };
+            }
+        };
+    };
+
+    subtest 'Second user' => sub {
+        my $user = $data->get_user($u2);
+        $t->get_ok("/introspection/user/$u2")->status_is(200)
+            ->text_is(h1 => 'User ' . $t->app->shorten($u2));
+
+        subtest 'Base data' => sub {
+            my $base_data_rows = $t->tx->res->dom('#user-base-data li');
+            is scalar(@$base_data_rows) => 4, 'Got two base data rows';
+            my ($r_uuid, $r_crea, $r_ent, $r_ref) = @$base_data_rows;
+            like $r_uuid->all_text => qr/^ UUID: \s+ $u2 $/x,
+                'Correct UUID row';
+            my $rx = quotemeta strftime '%F %T' => localtime $user->{created};
+            like $r_crea->all_text => qr/^ Created: \s+ $rx $/x,
+                'Correct created row';
+            like $r_ent->all_text => qr/^ Entity: /x,
+                'Correct entity row text beginning';
+            my $ent_link = $r_ent->at('a');
+            is $ent_link->attr('href') =>
+               '/introspection/entity/' . $user->{entity},
+               'Correct entity link url';
+            is $ent_link->text, $t->app->shorten($user->{entity}),
+                'Correct entity link text';
+            like $r_ref->all_text => qr/^ Reference\ user: /x,
+                'Correct reference row text beginning';
+            my $ref_link = $r_ref->at('a');
+            is $ref_link->attr('href') =>
+                '/introspection/user/' . $user->{reference},
+                'Correct reference user link url';
+            is $ref_link->text, $t->app->shorten($user->{reference}),
+                'Correct reference user link text';
+        };
+
+        subtest 'User data' => sub {
+           my $thead = $t->tx->res->dom->at('#user-data thead');
+            like $thead->all_text => qr/^ \s* Field \s+ Data \s* $/x,
+                'Correct table head';
+            my $data_rows = $t->tx->res->dom('#user-data tbody tr');
+            my $data = $user->{data};
+            is scalar(@$data_rows) => scalar(keys %$data),
+                'Correct data field count';
+
+            for my $i (0 .. keys(%$data) - 1) {
+                my $key = (sort keys %$data)[$i];
+                my $row = $data_rows->[$i];
+                subtest "Row $i" => sub {
+                    is $row->at('th')->text => $key, 'Correct field th';
+                    is $row->at('td code')->text => pp($data->{$key}),
+                        'Correct data stringification';
+                };
+            }
+        };
+
+        subtest 'Direct successors' => sub {
+            my $thead = $t->tx->res->dom->at('#user-successors thead');
+            like $thead->all_text => qr/^ \s* User \s+ UUID
+                \s+ Created \s+ Data \s* $/x, 'Correct table head';
+
+            my $user_rows = $t->tx->res->dom('#user-successors tbody tr');
+            is scalar(@$user_rows) => 0, 'No user row found';
+        };
     };
 };
 
