@@ -109,7 +109,54 @@ __DATA__
 % layout 'vg_intro', title => 'User ' . shorten $uuid;
 % use POSIX 'strftime';
 % use Data::Dump 'pp';
-<pre><%= pp $user %></pre>
+
+<ul id="user-base-data" class="list-group">
+    <li class="list-group-item"><strong>UUID</strong>:
+        <code><%= $user->{uuid} %></code></li>
+    <li class="list-group-item"><strong>Created</strong>:
+        <%= strftime '%F %T' => localtime $user->{created} %></li>
+    <li class="list-group-item"><strong>Entity</strong>:
+        <%= link_to shorten($user->{entity}) => vg_intro_show_entity => {uuid => $user->{entity}} %></li>
+    <li class="list-group-item"><strong>Reference user</strong>:
+        <%= defined($user->{reference}) ? link_to(shorten($user->{reference}) => vg_intro_show_user => {uuid => $user->{reference}}) : 'None' %></li>
+</ul>
+
+<h2>User Data</h2>
+<table id="user-data" class="table table-hover">
+    <thead class="thead-light">
+        <th scope="col">Field</th>
+        <th scope="col">Data</th>
+    </thead>
+    <tbody>
+    % for my $field (sort keys %{$user->{data}}) {
+        <tr>
+            <th scope="row"><%= $field %></th>
+            <td><code><%= pp $user->{data}{$field} %></code></td>
+        </tr>
+    % }
+    </tbody>
+</table>
+
+<h2>Direct Successors</h2>
+% my @succs = map {viralgiral_data->get_user($_)} @{$user->{successors}};
+<table id="user-successors" class="table table-hover">
+    <thead class="thead-light">
+        <th scope="col">User UUID</th>
+        <th scope="col">Created</th>
+        <th scope="col">Data</th>
+    </thead>
+    <tbody>
+    % for my $user (@succs) {
+        <tr>
+            <th scope="row">
+                %= link_to shorten($user->{uuid}) => vg_intro_show_user => {uuid => $user->{uuid}}
+            </th>
+            <td><%= strftime '%F %T' => localtime $user->{created} %></td>
+            <td><pre><code><%= pp $user->{data} %></code></pre></td>
+        </tr>
+    % }
+    </tbody>
+</table>
 
 @@ layouts/vg_intro.html.ep
 <!doctype html>
