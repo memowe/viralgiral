@@ -1,5 +1,6 @@
 package ViralGiral::Data;
 use Mojo::Base -base, -signatures;
+use Carp;
 
 use ViralGiral::Data::EventStore;
 
@@ -91,7 +92,7 @@ sub modify_entity ($self, $uuid, $data) {
     # Entity lookup
     my $e = $self->get_entity($uuid);
     my $uuid_str = $uuid // 'undef';
-    die "Unknown entity with UUID '$uuid_str'\n" unless defined $e;
+    croak "Unknown entity with UUID '$uuid_str'\n" unless defined $e;
 
     # Mix data updates in
     my %new_data = (%{$e->{data}}, %$data);
@@ -107,7 +108,7 @@ sub delete_entity ($self, $uuid) {
 
     # Entity lookup
     my $uuid_str = $uuid // 'undef';
-    die "Unknown entity with UUID '$uuid_str'\n"
+    croak "Unknown entity with UUID '$uuid_str'\n"
         unless defined $self->get_entity($uuid);
 
     # Store event
@@ -119,10 +120,10 @@ sub add_user ($self, $entity_uuid, $reference, $data = {}) {
     # Entity lookup
     my $e = $self->get_entity($entity_uuid);
     my $entity_uuid_str = $entity_uuid // 'undef';
-    die "Unknown entity with UUID '$entity_uuid_str'\n" unless defined $e;
+    croak "Unknown entity with UUID '$entity_uuid_str'\n" unless defined $e;
 
     # Reference lookup
-    die "Unknown user reference with UUID '$reference'\n"
+    croak "Unknown user reference with UUID '$reference'\n"
         if defined $reference and not defined $self->get_user($reference);
 
     # Prepare
@@ -155,7 +156,7 @@ sub modify_user ($self, $uuid, $data) {
     # User lookup
     my $u = $self->get_user($uuid);
     my $uuid_str = $uuid // 'undef';
-    die "Unknown user with UUID '$uuid_str'\n" unless defined $u;
+    croak "Unknown user with UUID '$uuid_str'\n" unless defined $u;
 
     # Mix data updates in
     my %new_data = (%{$u->{data}}, %$data);
@@ -171,7 +172,7 @@ sub delete_user ($self, $uuid) {
 
     # User lookup
     my $uuid_str = $uuid // 'undef';
-    die "Unknown user with UUID '$uuid_str'\n"
+    croak "Unknown user with UUID '$uuid_str'\n"
         unless defined $self->get_user($uuid);
 
     # Store event
@@ -183,7 +184,7 @@ sub delete_user ($self, $uuid) {
 sub _get_user_strict ($self, $uuid) {
     my $u = $self->get_user($uuid);
     my $uuid_str = $uuid // 'undef';
-    die "Unknown user with UUID '$uuid_str'\n" unless defined $u;
+    croak "Unknown user with UUID '$uuid_str'\n" unless defined $u;
     return $u;
 }
 

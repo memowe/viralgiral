@@ -1,5 +1,6 @@
 package ViralGiral::Data::EventStore;
 use Mojo::Base -base, -signatures;
+use Carp;
 
 use EventStore::Tiny;
 use Clone 'clone';
@@ -38,7 +39,7 @@ has _est            => sub ($self) {
 };
 
 sub store_to_file ($self) {
-    die "No data_filename given!\n"
+    croak "No data_filename given!\n"
         unless defined $self->data_filename;
     $self->_est->export_events($self->data_filename);
 }
