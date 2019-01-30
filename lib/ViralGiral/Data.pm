@@ -226,9 +226,9 @@ sub get_all_successors ($self, $uuid) {
 
     # Iterate
     my @successors;
-    while (defined(my $user = $self->get_user(pop @succ_uuids_todo))) {
-        push @successors, $user;
-        push @succ_uuids_todo, @{$user->{successors}};
+    while (defined(my $u = $self->get_user(pop @succ_uuids_todo))) {
+        push @successors, $u;
+        push @succ_uuids_todo, @{$u->{successors}};
     }
 
     # Return sorted flat list of all successors
