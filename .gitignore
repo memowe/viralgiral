@@ -16,8 +16,5 @@ cover_db/
 # Storage file
 VG_data
 
-# Temporary files
-tmp*
-
 # Distribution tarballs
 ViralGiral-*.tar.gz
