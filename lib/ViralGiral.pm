@@ -26,6 +26,9 @@ sub register ($self, $app, $conf) {
         return $text;
     });
 
+    # Add viralgiral commands to the app script
+    push @{$app->commands->namespaces}, 'ViralGiral::Command';
+
     # Inject routes
     my $r = $app->routes->detour(namespace => 'ViralGiral::Controller');
     $r->get("$prefix/info")->to('actions#info')->name('vg_info');
