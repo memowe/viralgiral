@@ -1,0 +1,3 @@
+[submodule "Test-Mojo-CommandOutputRole"]
+	path = Test-Mojo-CommandOutputRole
+	url = https://github.com/memowe/Test-Mojo-CommandOutputRole.git

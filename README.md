@@ -39,7 +39,8 @@ Prerequisites
 | [EventStore::Tiny][evstti] | 0.6 |
 | [Mojolicious][mojo] | 7.93 |
 | [UUID::Tiny][uuti] | 1.04 |
-| *[Test::Exception][teex]<br>(Tests only)* | *0.43* |
+| *[Test::Exception][teex] (Tests only)* | *0.43* |
+| *[Test::Mojo::CommandOutputRole][tmcor] (Tests only)*<br>*as a submodule* | *0.01* |
 
 [perl]: https://www.perl.org/get.html
 [clone]: https://metacpan.org/pod/Clone
@@ -47,6 +48,7 @@ Prerequisites
 [mojo]: https://metacpan.org/pod/Mojolicious
 [uuti]: https://metacpan.org/pod/UUID::Tiny
 [teex]: https://metacpan.org/pod/Test::Exception
+[tmcor]: https://github.com/memowe/Test-Mojo-CommandOutputRole
 
 License and copyright
 ---------------------
