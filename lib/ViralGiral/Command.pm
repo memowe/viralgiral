@@ -1,12 +1,6 @@
 package ViralGiral::Command;
+use Role::Tiny;
 use Mojo::Base -strict, -signatures;
-use Exporter 'import';
-
-our @EXPORT_OK = qw(
-    desc_with_thing
-    usage_with_thing
-    run_with_thing
-);
 
 sub desc_with_thing ($self, $thing, $things) {
     "Show or manipulate $things"
