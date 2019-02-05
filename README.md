@@ -36,6 +36,7 @@ Prerequisites
 | Module | Version |
 |--------|--------:|
 | [Clone][clone] | 0.39 |
+| [Data::Dump][dadu] | 1.23 |
 | [EventStore::Tiny][evstti] | 0.6 |
 | [Mojolicious][mojo] | 7.93 |
 | [UUID::Tiny][uuti] | 1.04 |
@@ -44,6 +45,7 @@ Prerequisites
 
 [perl]: https://www.perl.org/get.html
 [clone]: https://metacpan.org/pod/Clone
+[dadu]: https://metacpan.org/pod/Data::Dump
 [evstti]: https://metacpan.org/pod/EventStore::Tiny
 [mojo]: https://metacpan.org/pod/Mojolicious
 [uuti]: https://metacpan.org/pod/UUID::Tiny

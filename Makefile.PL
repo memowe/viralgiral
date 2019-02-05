@@ -13,6 +13,7 @@ WriteMakefile(
     MIN_PERL_VERSION    => '5.20.0',
     PREREQ_PM           => {
         'Clone'             => '0.39',
+        'Data::Dump'        => '1.23',
         'EventStore::Tiny'  => '0.6',
         'Mojolicious'       => '7.93',
         'UUID::Tiny'        => '1.04',
