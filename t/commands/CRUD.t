@@ -2,8 +2,9 @@
 
 #--- Example app ---
 use Mojolicious::Lite;
+use lib map app->home->rel_file($_)->to_string =>
+    qw(../lib ../../Test-Mojo-CommandOutputRole/lib);
 use File::Temp 'tmpnam';
-use lib app->home->rel_file('../lib')->to_string;
 plugin ViralGiral => {data_filename => scalar tmpnam};
 my $t = Test::Mojo->new->with_roles('Test::Mojo::CommandOutputRole');
 $ENV{MOJO_LOG_LEVEL} = 'fatal';
@@ -30,8 +31,6 @@ use Mojo::Base -strict, -signatures;
 use Test::More;
 use Test::Mojo;
 use Data::Dump 'dump';
-use FindBin;
-use lib "$FindBin::Bin/../../Test-Mojo-CommandOutputRole/lib";
 
 my %usage = (
     entity => <<'USAGE',
