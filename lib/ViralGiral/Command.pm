@@ -15,7 +15,7 @@ Usage: APPLICATION vg_$thing [OPTIONS] [UUID]
 
     ./app vg_$thing UUID
     ./app vg_$thing --list --sort=name
-    ./app vg_$thing --create "name => 'Foo', color => 'white'"
+    ./app vg_$thing --create ${\($thing eq 'user' ? 'EUID ' : '')}"name => 'Foo', color => 'white'"
     ./app vg_$thing --update "answer => 42" UUID
     ./app vg_$thing --delete UUID
 
@@ -27,7 +27,7 @@ Runmode list (--list [--sort X] [--show Y] [UUID])
     - Complete dump of all data of the $thing when a UUID is given.
     - The list runmode is default, so it doesn't need to be typed.
 
-Runmode create (--create DATA_STRING)
+Runmode create (--create ${\($thing eq 'user' ? 'EUID ' : '')}DATA_STRING)
 
     - Create a new $thing, the created UUID is printed back.
     - Interprete the given DATA_STRING as the new data hash.
@@ -157,6 +157,16 @@ sub _summarize ($self, $thing, $verbose, $thing_data, $show = undef) {
 
 sub _create ($self, $thing, @args) {
 
+    # User: try to find entity
+    my $entity;
+    if ($thing eq 'user') {
+        my $e_id    = shift @args;
+        return print $self->usage unless defined $e_id;
+        my $e       = $self->app->viralgiral_data->get_entity($e_id);
+        return print "Unknown entity '$e_id'.\n" unless defined $e;
+        $entity = $e_id;
+    }
+
     # Try to parse data
     my $data = {};
     if (defined(my $data_str = shift @args)) {
@@ -174,7 +184,9 @@ sub _create ($self, $thing, @args) {
 
     # Create
     my $creator = $thing eq 'entity' ? 'add_entity' : 'add_user';
-    my $uuid = $self->app->viralgiral_data->$creator($data);
+    my $uuid = $self->app->viralgiral_data->$creator(
+        $thing eq 'entity' ? ($data) : ($entity, $data)
+    );
     return print "New $thing with UUID '$uuid' created.\n";
 }
 

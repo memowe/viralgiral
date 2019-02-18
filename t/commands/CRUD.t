@@ -70,7 +70,7 @@ Usage: APPLICATION vg_user [OPTIONS] [UUID]
 
     ./app vg_user UUID
     ./app vg_user --list --sort=name
-    ./app vg_user --create "name => 'Foo', color => 'white'"
+    ./app vg_user --create EUID "name => 'Foo', color => 'white'"
     ./app vg_user --update "answer => 42" UUID
     ./app vg_user --delete UUID
 
@@ -82,7 +82,7 @@ Runmode list (--list [--sort X] [--show Y] [UUID])
     - Complete dump of all data of the user when a UUID is given.
     - The list runmode is default, so it doesn't need to be typed.
 
-Runmode create (--create DATA_STRING)
+Runmode create (--create EUID DATA_STRING)
 
     - Create a new user, the created UUID is printed back.
     - Interprete the given DATA_STRING as the new data hash.
@@ -253,7 +253,72 @@ subtest User => sub {
     };
 
     subtest Create => sub {
-        ok 1; # TODO
+
+        subtest 'No matching entity' => sub {
+            $t->command_output(vg_user => ['--create'] => $usage{entity},
+                'No entity UUID given');
+            $t->command_output(vg_user => ['--create', '17'] =>
+                "Unknown entity '17'.\n", 'Unknown entity given');
+        };
+
+        subtest 'No data' => sub {
+            my $user_count = keys %{$model->all_users};
+
+            $t->command_output(vg_user => ['--create', $e1_id] => sub ($o) {
+                ok $o =~ /^New user with UUID '(\S+)' created\.$/,
+                    'Correct output text format';
+                my $new_id = $1;
+                is scalar(keys %{$model->all_users}) => $user_count + 1,
+                    'Entity count increased by one';
+                my $e = $model->get_user($new_id);
+                ok defined($e), 'Got a new user';
+                is_deeply $e->{data} => {}, 'No data set';
+            });
+        };
+
+        subtest 'With data' => sub {
+
+            subtest Malformed => sub {
+                $t->command_output(vg_user => ['-c', $e1_id, 'xnorfzt'] =>
+                    "Malformed data: xnorfzt\n", 'Bareword');
+                $t->command_output(vg_user => ['-c', '42'] =>
+                    "Malformed data: 42\n", 'Scalar value');
+            };
+
+            subtest 'Correct hash data' => sub {
+
+                my $user_count = keys %{$model->all_users};
+                $t->command_output(vg_user => ['-c', $e1_id, "a => 42"] =>
+                sub ($o) {
+                    ok $o =~ /^New user with UUID '(\S+)' created\.$/,
+                        'Correct output text format';
+                    my $new_id = $1;
+                    is scalar(keys %{$model->all_users}) =>
+                        $user_count + 1,
+                        'Entity count increased by one';
+                    my $e = $model->get_user($new_id);
+                    ok defined($e), 'Got a new user';
+                    is_deeply $e->{data} => {a => 42}, 'Correct data';
+                }, 'Plain hash syntax');
+
+                $user_count = keys %{$model->all_users};
+                $t->command_output(vg_user =>
+                ['-c', $e1_id, "{b => 17, c => {answer => 42}}"] =>
+                sub ($o) {
+                    ok $o =~ /^New user with UUID '(\S+)' created\.$/,
+                        'Correct output text format';
+                    my $new_id = $1;
+                    is scalar(keys %{$model->all_users}) =>
+                        $user_count + 1,
+                        'Entity count increased by one';
+                    my $e = $model->get_user($new_id);
+                    ok defined($e), 'Got a new user';
+                    is_deeply $e->{data} =>
+                        {b => 17, c => {answer => 42}},
+                        'Correct data';
+                }, 'Hash syntax with surrounding braces');
+            };
+        };
     };
 
     subtest Update => sub {
