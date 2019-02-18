@@ -142,7 +142,64 @@ subtest Entity => sub {
     };
 
     subtest Create => sub {
-        ok 1; # TODO
+
+        subtest 'No data' => sub {
+            my $entity_count = keys %{$model->all_entities};
+
+            $t->command_output(vg_entity => ['--create'] => sub ($output) {
+                ok $output =~ /^New entity with UUID '(\S+)' created\.$/,
+                    'Correct output text format';
+                my $new_id = $1;
+                is scalar(keys %{$model->all_entities}) => $entity_count + 1,
+                    'Entity count increased by one';
+                my $e = $model->get_entity($new_id);
+                ok defined($e), 'Got a new entity';
+                is_deeply $e->{data} => {}, 'No data set';
+            });
+        };
+
+        subtest 'With data' => sub {
+
+            subtest Malformed => sub {
+                $t->command_output(vg_entity => ['-c', 'xnorfzt'] =>
+                    "Malformed data: xnorfzt\n", 'Bareword');
+                $t->command_output(vg_entity => ['-c', '42'] =>
+                    "Malformed data: 42\n", 'Scalar value');
+            };
+
+            subtest 'Correct hash data' => sub {
+
+                my $entity_count = keys %{$model->all_entities};
+                $t->command_output(vg_entity => ['-c', "a => 42"] => sub ($o) {
+                    ok $o =~ /^New entity with UUID '(\S+)' created\.$/,
+                        'Correct output text format';
+                    my $new_id = $1;
+                    is scalar(keys %{$model->all_entities}) =>
+                        $entity_count + 1,
+                        'Entity count increased by one';
+                    my $e = $model->get_entity($new_id);
+                    ok defined($e), 'Got a new entity';
+                    is_deeply $e->{data} => {a => 42}, 'Correct data';
+                }, 'Plain hash syntax');
+
+                $entity_count = keys %{$model->all_entities};
+                $t->command_output(vg_entity =>
+                ['-c', "{b => 17, c => {answer => 42}}"] =>
+                sub ($o) {
+                    ok $o =~ /^New entity with UUID '(\S+)' created\.$/,
+                        'Correct output text format';
+                    my $new_id = $1;
+                    is scalar(keys %{$model->all_entities}) =>
+                        $entity_count + 1,
+                        'Entity count increased by one';
+                    my $e = $model->get_entity($new_id);
+                    ok defined($e), 'Got a new entity';
+                    is_deeply $e->{data} =>
+                        {b => 17, c => {answer => 42}},
+                        'Correct data';
+                }, 'Hash syntax with surrounding braces');
+            };
+        };
     };
 
     subtest Update => sub {

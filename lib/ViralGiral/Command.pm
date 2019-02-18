@@ -156,6 +156,26 @@ sub _summarize ($self, $thing, $verbose, $thing_data, $show = undef) {
 }
 
 sub _create ($self, $thing, @args) {
+
+    # Try to parse data
+    my $data = {};
+    if (defined(my $data_str = shift @args)) {
+        $data_str =~ s/^\{(.*)\}$/$1/;
+
+        # Evaluate
+        local $SIG{__WARN__} = sub {die shift}; # die on warnings
+        $data = eval "my \$scalar = \{$data_str\}";
+
+        # Catch
+        unless (defined $data) {
+            return print "Malformed data: $data_str\n";
+        }
+    }
+
+    # Create
+    my $creator = $thing eq 'entity' ? 'add_entity' : 'add_user';
+    my $uuid = $self->app->viralgiral_data->$creator($data);
+    return print "New $thing with UUID '$uuid' created.\n";
 }
 
 sub _update ($self, $thing, @args) {
